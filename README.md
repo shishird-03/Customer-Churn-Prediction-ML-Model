@@ -2,7 +2,7 @@
 
 This project is an end-to-end Machine Learning solution to predict customer churn. It includes an exploratory data analysis and model training pipeline, as well as an interactive web dashboard built with Flask to serve the predictions and provide insights through SHAP explainability and Plotly visualizations.
 
-## 🚀 Features
+##  Features
 
 - **Machine Learning Model**: A robust Random Forest Classifier trained to balance the classes using SMOTE.
 - **Explainable AI (XAI)**: Integration with SHAP to explain the key features influencing each prediction.
@@ -11,7 +11,7 @@ This project is an end-to-end Machine Learning solution to predict customer chur
 - **Comprehensive Evaluation**: Extensive model validation handling class imbalances, achieving high prediction accuracy.
 - **Batch Processing:** Ability to upload CSVs and get mass predictions.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **Data Processing & ML**: `pandas`, `numpy`, `scikit-learn`, `xgboost`, `imbalanced-learn`
 - **Model Explainability**: `shap`
@@ -19,7 +19,7 @@ This project is an end-to-end Machine Learning solution to predict customer chur
 - **Visualizations**: `plotly`
 - **Model Serialization**: `pickle`
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 .
@@ -35,7 +35,7 @@ This project is an end-to-end Machine Learning solution to predict customer chur
     └── model_info.html
 ```
 
-## ⚙️ Installation & Setup
+##  Installation & Setup
 
 1. **Clone the repository** (if applicable) and navigate to the project directory:
    ```bash
@@ -63,7 +63,7 @@ This project is an end-to-end Machine Learning solution to predict customer chur
    ```
    The application will start at `http://localhost:5000` or `http://127.0.0.1:5000`.
 
-## 📊 Model Performance
+##  Model Performance
 
 Based on the evaluation report, the Random Forest model performs exceptionally well at identifying churn patterns:
 
@@ -74,7 +74,7 @@ Based on the evaluation report, the Random Forest model performs exceptionally w
 
 *See `evaluation_report.md` for a complete breakdown of metrics and confusion matrix analysis.*
 
-## 💻 API Usage
+##  API Usage
 
 You can make programmatic requests to the API for predictions:
 
@@ -92,6 +92,4 @@ You can make programmatic requests to the API for predictions:
   "OnlineSecurity": "No"
 }
 ```
-
-## 📄 License
-This project is for educational and portfolio purposes.
+Author: Shishir D
