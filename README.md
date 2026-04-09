@@ -1,52 +1,97 @@
-# Customer Churn Prediction Web App
+# Customer Churn Prediction & Web Dashboard
 
-## Short Description
-A machine learning project and web application that predicts whether a telecom customer is likely to churn (cancel their service). It features an end-to-end Machine Learning pipeline trained on the IBM Telco dataset and is served through a user-friendly Flask web interface.
-
----
+This project is an end-to-end Machine Learning solution to predict customer churn. It includes an exploratory data analysis and model training pipeline, as well as an interactive web dashboard built with Flask to serve the predictions and provide insights through SHAP explainability and Plotly visualizations.
 
 ## 🚀 Features
-* **Machine Learning Model**: Built and evaluated multiple models (Logistic Regression, AdaBoost, KNN, Random Forest). The best-performing model (Random Forest) was exported for production.
-* **Data Preprocessing**: Handled missing values, outliers (using Z-scores), encoding (One-Hot Encoding), and class imbalance using **SMOTE** (Synthetic Minority Over-sampling Technique).
-* **Interactive Web App**: A pure Flask application that allows users to input customer data (like Tenure and Monthly Charges) and instantly receive a prediction on whether the customer will churn.
-* **Dynamic UI**: The web frontend automatically calculates total charges based on the inputted tenure and monthly charges to streamline the user experience.
 
-## 🛠️ Technologies Used
-* **Python**: Core programming language.
-* **Jupyter Notebook**: For Exploratory Data Analysis (EDA) and model building.
-* **Scikit-Learn & Imbalanced-Learn**: For training the ML models and handling class imbalances.
-* **Flask**: For creating the backend web API and serving the pages.
-* **HTML/CSS & JavaScript**: For the frontend user interface.
-* **Pandas, NumPy, Seaborn & Matplotlib**: For data manipulation and visualization.
+- **Machine Learning Model**: A robust Random Forest Classifier trained to balance the classes using SMOTE.
+- **Explainable AI (XAI)**: Integration with SHAP to explain the key features influencing each prediction.
+- **Web Dashboard**: An interactive, user-friendly UI built with Flask to input customer data and get real-time churn predictions.
+- **REST API**: JSON-based endpoints for headless predictions (`/predict-api`).
+- **Comprehensive Evaluation**: Extensive model validation handling class imbalances, achieving high prediction accuracy.
+- **Batch Processing:** Ability to upload CSVs and get mass predictions.
 
-## 📂 Project Structure
-* `Model.ipynb`: The core notebook containing data exploration, preprocessing, and model training.
-* `app.py`: The Flask server that loads the trained model and handles web requests.
-* `templates/index.html`: The frontend HTML interface for the web app.
-* `model.pkl`: The exported Random Forest model.
-* `model_columns.pkl`: The exported column structure required for the model to make predictions.
+## 🛠️ Tech Stack
 
-## ⚙️ How to Run Locally
+- **Data Processing & ML**: `pandas`, `numpy`, `scikit-learn`, `xgboost`, `imbalanced-learn`
+- **Model Explainability**: `shap`
+- **Web Framework**: `Flask`, `werkzeug`, `gunicorn`
+- **Visualizations**: `plotly`
+- **Model Serialization**: `pickle`
 
-1. **Clone the repository:**
+## 📁 Project Structure
+
+```text
+.
+├── app_enhanced.py                 # Flask web application and API endpoints
+├── Model.ipynb                     # Jupyter notebook for EDA, data preprocessing, and model training
+├── customer_churn_prediction.csv   # Primary dataset
+├── evaluation_report.md            # Detailed model evaluation and metrics
+├── project_presentation_guide.md   # Guide for presenting the project
+├── requirements.txt                # Python dependencies
+└── templates/                      # HTML templates for the Flask application
+    ├── dashboard.html
+    ├── index_enhanced.html
+    └── model_info.html
+```
+
+## ⚙️ Installation & Setup
+
+1. **Clone the repository** (if applicable) and navigate to the project directory:
    ```bash
-   git clone <your-github-repo-url>
    cd ML
    ```
 
-2. **Install the required dependencies:**
-   Make sure you have Python installed, then run:
+2. **Create a virtual environment** (recommended):
    ```bash
-   pip install flask pandas scikit-learn imbalanced-learn numpy
+   python -m venv venv
+   # On Windows: venv\Scripts\activate
+   # On macOS/Linux: source venv/bin/activate
    ```
 
-3. **Run the Flask App:**
+3. **Install dependencies**:
    ```bash
-   python app.py
+   pip install -r requirements.txt
    ```
 
-4. **Use the App:**
-   Open your web browser and go to: `http://127.0.0.1:5000`
+4. **Train the Model**:
+   Run the `Model.ipynb` notebook to preprocess the data, train the Random Forest model, and export the required `.pkl` files (`model.pkl` and `model_columns.pkl`) needed by the web app.
 
-## 📊 Dataset Context
-The project uses the **Telco Customer Churn** dataset, which contains information about a fictional telecom company that provided home phone and internet services to 7043 customers in California. The target variable is `Churn` (1 = Yes, 0 = No).
+5. **Run the Flask Application**:
+   ```bash
+   python app_enhanced.py
+   ```
+   The application will start at `http://localhost:5000` or `http://127.0.0.1:5000`.
+
+## 📊 Model Performance
+
+Based on the evaluation report, the Random Forest model performs exceptionally well at identifying churn patterns:
+
+- **Overall Accuracy**: ~94.39%
+- **Precision (Churn)**: 0.90
+- **Recall (Churn)**: 0.89
+- **Class Balancing**: Used SMOTE to effectively manage false positives and false negatives, ensuring active users are properly prioritized for retention campaigns.
+
+*See `evaluation_report.md` for a complete breakdown of metrics and confusion matrix analysis.*
+
+## 💻 API Usage
+
+You can make programmatic requests to the API for predictions:
+
+**Endpoint:** `POST /predict-api`
+
+**Example Payload:**
+```json
+{
+  "tenure": 12,
+  "MonthlyCharges": 75.50,
+  "TotalCharges": 906.00,
+  "Contract": "Month-to-month",
+  "InternetService": "Fiber optic",
+  "PaymentMethod": "Electronic check",
+  "OnlineSecurity": "No"
+}
+```
+
+## 📄 License
+This project is for educational and portfolio purposes.

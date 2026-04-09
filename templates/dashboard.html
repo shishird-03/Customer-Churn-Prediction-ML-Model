@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | ChurnGuard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --blue: #3B8FA3;
+            --blue-dark: #2a7a8e;
+            --blue-light: #e8f6f9;
+            --teal: #9ED3DC;
+            --teal-dark: #7bbfca;
+            --teal-light: #e0f4f7;
+            --yellow: #FEFD99;
+            --yellow-dark: #e8e85c;
+            --mint: #DAF9DE;
+            --mint-dark: #a8edb2;
+            --slate-900: #1a2e35;
+            --slate-700: #2e4a52;
+            --slate-500: #5a7f8a;
+            --slate-300: #b8d4da;
+            --slate-100: #f0fafb;
+            --white: #FFFFFF;
+            --green: #2a8a40;
+            --green-light: #DAF9DE;
+            --red: #c0392b;
+            --red-light: #fdecea;
+            --amber: #b5850a;
+            --amber-light: #FEFD99;
+            --sidebar-w: 240px;
+            --radius: 8px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5fcfd;
+            color: var(--slate-700);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--slate-900);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            border-right: 3px solid var(--teal);
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .sidebar-brand .logo-text { font-size: 18px; font-weight: 700; color: var(--white); letter-spacing: -0.3px; }
+        .sidebar-brand .logo-sub { font-size: 11px; color: var(--slate-500); margin-top: 3px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .sidebar-nav { flex: 1; padding: 16px 10px; }
+
+        .nav-section-title {
+            font-size: 10px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--slate-500); padding: 8px 10px 6px;
+        }
+
+        .nav-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 10px; border-radius: 6px; color: #94A3B8;
+            text-decoration: none; font-size: 14px; font-weight: 500;
+            margin-bottom: 2px; transition: background 0.15s, color 0.15s;
+        }
+
+        .nav-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .nav-link:hover { background: rgba(255,255,255,0.06); color: var(--white); }
+        .nav-link.active { background: var(--teal); color: var(--slate-900); font-weight: 600; }
+
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 12px; color: var(--slate-500); }
+
+        .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--teal);
+            padding: 14px 32px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .topbar-title { font-size: 15px; font-weight: 600; color: var(--slate-900); }
+        .topbar-sub { font-size: 12px; color: var(--slate-500); margin-top: 2px; }
+
+        .health-badge {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 500; color: var(--slate-700);
+            background: var(--teal);
+            padding: 5px 12px; border-radius: 20px;
+        }
+
+        .health-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--green); animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+        .content { padding: 28px 32px; flex: 1; }
+
+        /* Stat Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--teal);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .stat-card-label {
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--slate-500);
+        }
+
+        .stat-card-value {
+            font-size: 28px; font-weight: 700; color: var(--slate-900);
+            margin: 8px 0 4px;
+        }
+
+        .stat-card-change {
+            font-size: 12px; color: var(--slate-500);
+        }
+
+        .stat-card-value.red { color: var(--red); }
+        .stat-card-value.green { color: var(--green); }
+        .stat-card-value.blue { color: var(--blue-dark); }
+
+        /* Charts */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .chart-card {
+            background: var(--white);
+            border: 1px solid var(--teal);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .chart-card.full { grid-column: 1 / -1; }
+
+        .chart-card-title { font-size: 14px; font-weight: 600; color: var(--slate-900); margin-bottom: 4px; }
+        .chart-card-sub { font-size: 12px; color: var(--slate-500); margin-bottom: 16px; }
+
+        .empty-state {
+            background: var(--white);
+            border: 1px solid var(--teal);
+            border-radius: var(--radius);
+            padding: 60px 24px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 48px; height: 48px; margin: 0 auto 16px;
+            color: var(--slate-300);
+        }
+
+        .empty-title { font-size: 15px; font-weight: 600; color: var(--slate-700); }
+        .empty-sub { font-size: 13px; color: var(--slate-500); margin-top: 6px; }
+
+        .btn-link {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 8px 20px;
+            background: var(--teal);
+            color: var(--slate-900);
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px; font-weight: 700;
+        }
+
+        @media (max-width: 900px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .content { padding: 20px; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo-text">ChurnGuard</div>
+        <div class="logo-sub">Retention Intelligence</div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="/" class="nav-link">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6h13M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-4"/>
+            </svg>
+            Predict
+        </a>
+        <a href="/dashboard" class="nav-link active">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Dashboard
+        </a>
+        <a href="/model-info" class="nav-link">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Model Info
+        </a>
+    </nav>
+    <div class="sidebar-footer">v1.0 &nbsp;&bull;&nbsp; Random Forest</div>
+</aside>
+
+<main class="main">
+    <div class="topbar">
+        <div>
+            <div class="topbar-title">Analytics Dashboard</div>
+            <div class="topbar-sub">Session prediction history and churn trend analysis</div>
+        </div>
+        <div class="health-badge">
+            <span class="health-dot"></span> Model Online
+        </div>
+    </div>
+
+    <div class="content">
+        {% if error %}
+            <div class="empty-state">
+                <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                </svg>
+                <div class="empty-title">Error Loading Dashboard</div>
+                <div class="empty-sub">{{ error }}</div>
+            </div>
+
+        {% elif total_predictions == 0 %}
+            <div class="empty-state">
+                <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
+                </svg>
+                <div class="empty-title">No Predictions Yet</div>
+                <div class="empty-sub">Head to the Predict page and run some predictions to see analytics here.</div>
+                <a href="/" class="btn-link">Go to Predict</a>
+            </div>
+
+        {% else %}
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-card-label">Total Predictions</div>
+                    <div class="stat-card-value blue">{{ total_predictions }}</div>
+                    <div class="stat-card-change">This session</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Churn Cases</div>
+                    <div class="stat-card-value red">{{ churn_count }}</div>
+                    <div class="stat-card-change">Flagged as high risk</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Churn Rate</div>
+                    <div class="stat-card-value {% if churn_rate > 50 %}red{% else %}green{% endif %}">{{ churn_rate }}%</div>
+                    <div class="stat-card-change">Of all predictions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Avg. Confidence</div>
+                    <div class="stat-card-value">{{ avg_confidence }}%</div>
+                    <div class="stat-card-change">Model certainty</div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-card-title">Churn Distribution</div>
+                    <div class="chart-card-sub">Churn vs. No Churn breakdown</div>
+                    {{ pie_chart | safe }}
+                </div>
+                <div class="chart-card">
+                    <div class="chart-card-title">Confidence Distribution</div>
+                    <div class="chart-card-sub">Model certainty across predictions</div>
+                    {{ histogram | safe }}
+                </div>
+            </div>
+
+            <div class="chart-card full">
+                <div class="chart-card-title">Prediction Trend</div>
+                <div class="chart-card-sub">Cumulative churn predictions over time</div>
+                {{ trend | safe }}
+            </div>
+        {% endif %}
+    </div>
+</main>
+
+</body>
+</html>

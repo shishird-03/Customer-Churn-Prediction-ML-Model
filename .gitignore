@@ -19,3 +19,9 @@ ENV/
 # Ignore large data files or models if they get too big (optional)
 # *.csv
 # *.pkl
+model.pkl
+model_columns.pkl
+
+# OS Generated
+.DS_Store
+Thumbs.db
